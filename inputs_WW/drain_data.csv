@@ -1,0 +1,3 @@
+﻿drain_ID,lake,lake_ID,volume_discharged,DO(mg/l),nitrates(mg/l),phosphates(mg/l)
+1,Jakkur,1,3,5,15,3
+2,Jakkur,1,2,4,15,3
