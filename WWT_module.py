@@ -21,8 +21,12 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 
+#ignore all warnings
+import warnings
+warnings.filterwarnings('ignore')
+
 #import functions
-from utility_functions import process_efficiency
+from utility_functions import *
 
 #constants
 NB_LAKES = 37
@@ -195,7 +199,8 @@ total_effluent_bod = np.zeros((NB_LAKES , NB_DAYS,)) #bod concentration in the e
 for idx_lake in range(0, NB_LAKES):
     nstps = np.shape(stp_data.loc[stp_data['lake_ID'] == idx_lake])[0]
     stp_capacity_table = (stp_data.loc[stp_data['lake_ID'] == idx_lake])['capacity_volume'] #matrix of capacity for lake underconsideration
-    total_stp_capacity = stp_capacity_table.sum()
+    stp_utilisation_table = (stp_data.loc[stp_data['lake_ID'] == idx_lake])['percentage_utilisation']
+    total_stp_capacity = (stp_capacity_table * stp_utilisation_table).sum()
     volume_treated_stp = np.zeros((1,nstps))
     effluent_tss = np.zeros((1,nstps))
     effluent_cod = np.zeros((1,nstps))
@@ -203,12 +208,13 @@ for idx_lake in range(0, NB_LAKES):
     for day in range(0, NB_DAYS): 
         for istp in range(0, nstps):
             istp_capacity = stp_capacity_table[istp]
-            volume_treated_stp[istp] = treated_volume_ww[idx_lake, day] * istp_capacity / total_stp_capacity
-            stp_type = stp_data['technologies_type'][istp]
+            istp_utilisation = stp_utilisation_table[istp]
+            volume_treated_stp[istp] = treated_volume_ww[idx_lake, day] * istp_capacity * istp_utilisation / total_stp_capacity
+            stp_type = str(stp_data['technologies_type'][istp])
             i_tss = wastewater_quality_data['TSS'][istp]
             i_cod = wastewater_quality_data['COD'][istp]
             i_bod = wastewater_quality_data['BOD'][istp]
-            f_tss, f_cod, f_bod = process_efficiency(stp_type, i_tss, i_cod, i_bod)
+            f_tss, f_cod, f_bod = total_efficiency(stp_type, i_tss, i_cod, i_bod)
             effluent_tss[istp] = f_tss
             effluent_cod[istp] = f_cod
             effluent_bod[istp] = f_bod
@@ -218,9 +224,19 @@ for idx_lake in range(0, NB_LAKES):
         total_effluent_bod[idx_lake,day] = ((effluent_bod * volume_treated_stp).sum())/treated_volume_ww[idx_lake, day]
             
 
-#TO DO : other pollutants + take into account percentage of utilisation in matrix of capacity
+#TO DO : other pollutants 
 
-#####################################################################
+############################################################################################################
+#TO DO : Give flexibility to the user by enabling a part of untreated water in the Rjakaluve to enter the wetland 
+
+# for idx_lake in range(0, NB_LAKES):
+#         for day in range(0, NB_DAYS): 
+#             for istp in range(0, nstps):
+#                 technology_combination = read_technology_type(stp_type)
+
+
+
+############################################################################################################
 
 #Volume & Concentrations in the inflow of the lake
 
@@ -274,32 +290,3 @@ plt.show()
 
 
 
-# for ilake in range(1, nlake + 1):
-#     drain_data_lake = drain_data.loc[drain_data['lake_ID'] == ilake]
-#     total_discharged = drain_data_lake['volume_discharged'].sum()
-#     total_drain_volume_discharged.append(drain_data_lake['volume_discharged'].sum())
-#     total_drain_do_concentration.append((drain_data_lake['DO(mg/l)']*drain_data_lake['volume_discharged']).sum()/total_discharged)
-#     total_drain_nitrate_concentration.append((drain_data_lake['nitrates(mg/l)']*drain_data_lake['volume_discharged']).sum()/total_discharged)
-#     total_drain_phosphate_concentration.append((drain_data_lake['phosphates(mg/l)']*drain_data_lake['volume_discharged']).sum()/total_discharged)
-
-
-# total_volume_discharged = []
-# total_do_concentration = []
-# total_nitrates_concentration = []
-# total_phosphates_concentration = []
-
-# for ilake in range(1, nlake + 1):
-#     total_volume_discharged_by_stp = 0
-#     total_do_mass_of_stp = 0
-#     total_nitrates_mass_of_stp = 0
-#     total_phosphates_mass_of_stp = 0
-#     for k in range(len(lake_id)):
-#         if lake_id[k] == ilake:
-#             total_volume_discharged_by_stp += effluent_volume[k]
-#             total_do_mass_of_stp += effluent_do[k]*effluent_volume[k]
-#             total_nitrates_mass_of_stp += effluent_nitrate[k]*effluent_volume[k]
-#             total_phosphates_mass_of_stp += effluent_phosphate[k]*effluent_volume[k]
-#     total_volume_discharged.append(total_drain_volume_discharged[ilake - 1] + total_volume_discharged_by_stp)
-#     total_do_concentration.append((total_do_mass_of_stp + total_drain_do_concentration[ilake - 1] * total_drain_volume_discharged[ilake - 1])/total_volume_discharged[ilake - 1])
-#     total_nitrates_concentration.append((total_nitrates_mass_of_stp + total_drain_nitrate_concentration[ilake - 1] * total_drain_volume_discharged[ilake - 1])/total_volume_discharged[ilake - 1])
-#     total_phosphates_concentration.append((total_phosphates_mass_of_stp + total_drain_phosphate_concentration[ilake - 1] * total_drain_volume_discharged[ilake - 1])/total_volume_discharged[ilake - 1])
