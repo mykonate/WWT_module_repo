@@ -83,12 +83,9 @@ for i in range(NB_LAKES):
 wastewater_quality_path = os.path.join(input, "raw_sewage.csv")
 
 wastewater_quality_data = pd.read_csv(wastewater_quality_path,
-                        dtype={'pH':'float64', 
-                       'TSS':'float64', 'COD':'float64', 
-                       'BOD':'float64', 'TKN':'float64', 
-                       'nitrite + nitrate':'float64', 'ammonium':'float64',
-                       'phosphate':'float64',
-                       'TP':'float64'})
+                        dtype={'Date':'str','Temperature':'float64','pH':'float64','Nitrate':'float64',
+                       'TSS':'float64','BOD':'float64', 'COD':'float64', 
+                       'Ammonia':'float64','Phosphate':'float64'})
 
 #data on stormwater quality, calculated from litterature and Event Mean Concentration (EMC)
 stormwater_quality_path = os.path.join(input, "stormwater_quality.csv")
@@ -109,6 +106,7 @@ lake_quality_data = pd.read_csv(lake_quality_path,
                        'Nitrates':'float64', 'TSS':'float64', 
                        'BOD':'float64','COD':'float64','phosphate':'float64', 
                        'ammonium':'float64'})
+
 
 
 ###################################################################
@@ -134,11 +132,13 @@ for day in range(NB_DAYS):
         #calculation of treated and untreated volumes
         stp_data_lake = stp_data.loc[stp_data['lake_ID'] == idx_lake] #table of STPs discharging in the same lake
         total_stp_lake_capacity = (stp_data_lake['capacity_volume']*stp_data_lake['percentage_utilisation']).sum() #total volume that could be treated by the STPs discharging in a same lake
-        if (total_stp_lake_capacity > volume_ww[idx_lake, day]):
-            treated_volume_ww[idx_lake, day] = volume_ww[idx_lake, day]
+        sewerage_network_coverage = tank_data['treated'][idx_lake]
+        untreated_volume_ww[idx_lake, day] = (1-sewerage_network_coverage)* volume_ww[idx_lake, day]
+        if (total_stp_lake_capacity >  sewerage_network_coverage * volume_ww[idx_lake, day]):
+            treated_volume_ww[idx_lake, day] =  sewerage_network_coverage * volume_ww[idx_lake, day]
         else:
-            treated_volume_ww[idx_lake, day] =  total_stp_lake_capacity
-            untreated_volume_ww[idx_lake, day] = volume_ww[idx_lake, day] - treated_volume_ww[idx_lake, day]
+            treated_volume_ww[idx_lake, day] = sewerage_network_coverage * total_stp_lake_capacity
+            untreated_volume_ww[idx_lake, day] += volume_ww[idx_lake, day] - treated_volume_ww[idx_lake, day]
         
         #SCS runoff volume
         tank_crunvol[idx_lake, day] = tank_data_2[idx_lake]['tank_crunvol'][day]
@@ -170,15 +170,24 @@ untreated_water_ammonium = np.zeros((NB_LAKES , NB_DAYS,))
 #calculation of pollutant concentrations of the water entering the Rajakaluve
 for idx_lake in range(0, NB_LAKES):
     for day in range(0, NB_DAYS):
+        if (tank_crunvol[idx_lake, day] + tank_uspill[idx_lake, day] + untreated_volume_ww[idx_lake, day])== 0:
+         untreated_water_tss[idx_lake,day]=0 
+         untreated_water_cod[idx_lake,day]=0
+         untreated_water_bod[idx_lake,day]=0
+            
+            
+        else:
          untreated_water_tss[idx_lake,day] = (tank_crunvol[idx_lake, day] * stormwater_quality_data['TSS'][0] 
                                              + tank_uspill[idx_lake, day] * lake_quality_data['TSS'][day] 
                                              + untreated_volume_ww[idx_lake, day] * wastewater_quality_data['TSS'][day])/(tank_crunvol[idx_lake, day] + tank_uspill[idx_lake, day] + untreated_volume_ww[idx_lake, day]) 
+        
          untreated_water_cod[idx_lake,day] = (tank_crunvol[idx_lake, day] * stormwater_quality_data['COD'][0] 
                                              + tank_uspill[idx_lake, day] * lake_quality_data['COD'][day] 
                                              + untreated_volume_ww[idx_lake, day] * wastewater_quality_data['COD'][day])/(tank_crunvol[idx_lake, day] + tank_uspill[idx_lake, day] + untreated_volume_ww[idx_lake, day])
+
          untreated_water_bod[idx_lake,day] = (tank_crunvol[idx_lake, day] * stormwater_quality_data['BOD'][0] 
-                                             + tank_uspill[idx_lake, day] * lake_quality_data['BOD'][day] 
-                                             + untreated_volume_ww[idx_lake, day] * wastewater_quality_data['BOD'][day])/(tank_crunvol[idx_lake, day] + tank_uspill[idx_lake, day] + untreated_volume_ww[idx_lake, day])
+                                              + tank_uspill[idx_lake, day] * lake_quality_data['BOD'][day] 
+                                              + untreated_volume_ww[idx_lake, day] * wastewater_quality_data['BOD'][day])/(tank_crunvol[idx_lake, day] + tank_uspill[idx_lake, day] + untreated_volume_ww[idx_lake, day])
 
 #TO DO : other pollutants
 
@@ -211,9 +220,9 @@ for idx_lake in range(0, NB_LAKES):
             istp_utilisation = stp_utilisation_table[istp]
             volume_treated_stp[istp] = treated_volume_ww[idx_lake, day] * istp_capacity * istp_utilisation / total_stp_capacity
             stp_type = str(stp_data['technologies_type'][istp])
-            i_tss = wastewater_quality_data['TSS'][istp]
-            i_cod = wastewater_quality_data['COD'][istp]
-            i_bod = wastewater_quality_data['BOD'][istp]
+            i_tss = wastewater_quality_data['TSS'][day]
+            i_cod = wastewater_quality_data['COD'][day]
+            i_bod = wastewater_quality_data['BOD'][day]
             f_tss, f_cod, f_bod = total_efficiency(stp_type, i_tss, i_cod, i_bod)
             effluent_tss[istp] = f_tss
             effluent_cod[istp] = f_cod
@@ -273,6 +282,7 @@ for idx_lake in range(0, NB_LAKES):
                                           + untreated_water_tss[idx_lake,day] * tank_inflow[idx_lake, day])/ total_tank_inflow[idx_lake, day]
         total_inflow_cod[idx_lake, day] = (total_effluent_cod[idx_lake,day]*treated_volume_ww[idx_lake, day] 
                                           + untreated_water_cod[idx_lake,day] * tank_inflow[idx_lake, day])/ total_tank_inflow[idx_lake, day]
+        
         total_inflow_bod[idx_lake, day] = (total_effluent_bod[idx_lake,day]*treated_volume_ww[idx_lake, day] 
                                           + untreated_water_bod[idx_lake,day] * tank_inflow[idx_lake, day])/ total_tank_inflow[idx_lake, day]
  
@@ -289,4 +299,23 @@ plt.show()
 
 
 
+########################################################################################################################
 
+for idx_lake in range (NB_LAKES):
+    outcalc = [[untreated_volume_ww[idx_lake,:],untreated_water_tss[idx_lake,:],untreated_water_cod[idx_lake,:],untreated_water_bod[idx_lake,:],
+            total_effluent_tss[idx_lake,:],total_effluent_cod[idx_lake,:],total_effluent_bod[idx_lake,:],
+            total_inflow_tss[idx_lake,:],total_inflow_cod[idx_lake,:],total_inflow_bod[idx_lake,:]]]  
+
+    import itertools
+    flat = list(itertools.chain(*outcalc))
+    transp = list(zip(*flat))
+    outlake = "tank" + str(idx_lake) + ".csv"
+    outfile = os.path.join(output, outlake)
+    
+    with open(outfile, 'w') as f:
+        writerh = csv.DictWriter(f, fieldnames = ["untreated volume", "TSS in rajakaluve", "COD in rajakaluve", "BOD in rajakaluve", "TSS in STPs effluent", 
+                                                  "COD in STPs effluent", "BOD in STPs effluent",  
+                                                  "TSS in lake inflow", "COD in lake inflow", "BOD in lake inflow"], delimiter = ',')
+        writerh.writeheader()
+        writer = csv.writer(f)
+        writer.writerows(transp)
