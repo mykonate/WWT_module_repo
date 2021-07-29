@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Created on Wed Jun  2 17:35:00 2021
+Created on Wed Jul 28 23:27:41 2021
 
 @author: mkona
 """
@@ -32,7 +32,7 @@ from utility_functions import *
 
 #constants
 NB_LAKES = 37
-NB_DAYS = 365
+NB_DAYS = 184
 NB_STP = 1
 
 #set WWT module input & output path directories 
@@ -83,12 +83,12 @@ for i in range(NB_LAKES):
 #load all water sources quality csv file into Pandas dataframe
 
 #data on wastewater quality generated from Jakkur catchment 
-wastewater_quality_path = os.path.join(input_dir, "raw_sewage.csv")
+wastewater_quality_path = os.path.join(input_dir, "raw_sewage_half_year.csv")
 
 jakkur_wastewater_quality_data = pd.read_csv(wastewater_quality_path, sep=";",
                         dtype={'Date':'str','TSS':'float64','BOD':'float64','COD':'float64',
-                       'NO3-N':'float64','Nitrates':'float64', 'NH4-N':'float64', 
-                       'TN':'float64','PO4-P':'float64','TP':'float64'})
+                       'Nitrate':'float64', 'NH4-N':'float64', 
+                       'PO4-P':'float64'})
 
 
 
@@ -104,7 +104,7 @@ stormwater_quality_data = pd.read_csv(stormwater_quality_path, sep=";",
 
 #data on lake water quality (only available for Jakkur lake so these data are 
 #taken as a reference for a lake)
-lake_quality_path = os.path.join(input_dir, "jakkur_lake_quality.csv")
+lake_quality_path = os.path.join(input_dir, "jakkur_lake_quality_half_year.csv")
 
 jakkur_lake_quality_data = pd.read_csv(lake_quality_path, sep=";",
                         dtype={'Date':'str', 'TSS':'float64', 'BOD':'float64','COD':'float64','NO3-N':'float64',
@@ -114,18 +114,18 @@ jakkur_lake_quality_data = pd.read_csv(lake_quality_path, sep=";",
 
 #data of experimental concentrations in STP effluent 
 
-stp_effleunt_path = os.path.join(input_dir, "STP_effluent_experimental.csv")
+stp_effleunt_path = os.path.join(input_dir, "STP_effluent_exp_2016.csv")
 
 stp_effluent_exp_data = pd.read_csv(stp_effleunt_path, sep=";",
-                        dtype={'Date':'str', 'TSS':'float64', 'BOD':'float64','COD':'float64','NO3-N':'float64',
+                        dtype={'Date':'str', 'TSS':'float64', 'BOD':'float64','COD':'float64',
                        'Nitrates':'float64', 'NH4-N':'float64', 
-                       'TN':'float64','PO4-P':'float64','TP':'float64'})
+                       'PO4-P':'float64'})
 
 
 
 #data of experimental concentrations in wetland effleunt
 
-wetland_effleunt_path = os.path.join(input_dir, "wetland_effluent_experimental.csv")
+wetland_effleunt_path = os.path.join(input_dir, "wetland_effluent_exp_half_year.csv")
 
 wetland_effluent_exp_data = pd.read_csv(wetland_effleunt_path, sep=";",
                         dtype={'Date':'str', 'TSS':'float64', 'BOD':'float64','COD':'float64','NO3-N':'float64',
@@ -167,10 +167,10 @@ for day in range(NB_DAYS):
             untreated_volume_ww[idx_lake, day] += volume_ww[idx_lake, day] - treated_volume_ww[idx_lake, day]
         
         #SCS runoff volume
-        tank_crunvol[idx_lake, day] = tank_data_2[idx_lake]['tank_crunvol'][day]
+        tank_crunvol[idx_lake, day] = tank_data_2[idx_lake]['tank_crunvol'][120+day]
         
         #upstream spill volume 
-        tank_uspill[idx_lake, day] = tank_data_2[idx_lake]['tank_uspill'][day]
+        tank_uspill[idx_lake, day] = tank_data_2[idx_lake]['tank_uspill'][120+day]
     
 
 
@@ -228,9 +228,9 @@ for idx_lake in range(0, NB_LAKES):
                                                + tank_uspill[idx_lake, day] * jakkur_lake_quality_data['Nitrate'][day] 
                                                + untreated_volume_ww[idx_lake, day] * jakkur_wastewater_quality_data['Nitrate'][day])/(untreated_water_volume[idx_lake,day])
 
-         untreated_water_TN[idx_lake,day] = (tank_crunvol[idx_lake, day] * stormwater_quality_data['TN'][0] 
-                                               + tank_uspill[idx_lake, day] * jakkur_lake_quality_data['TN'][day] 
-                                               + untreated_volume_ww[idx_lake, day] * jakkur_wastewater_quality_data['TN'][day])/(untreated_water_volume[idx_lake,day])
+         # untreated_water_TN[idx_lake,day] = (tank_crunvol[idx_lake, day] * stormwater_quality_data['TN'][0] 
+         #                                       + tank_uspill[idx_lake, day] * jakkur_lake_quality_data['TN'][day] 
+         #                                       + untreated_volume_ww[idx_lake, day] * jakkur_wastewater_quality_data['TN'][day])/(untreated_water_volume[idx_lake,day])
 
          untreated_water_ammonia[idx_lake,day] = (tank_crunvol[idx_lake, day] * stormwater_quality_data['NH3-N'][0] 
                                                + tank_uspill[idx_lake, day] * jakkur_lake_quality_data['NH4-N'][day] 
@@ -240,9 +240,9 @@ for idx_lake in range(0, NB_LAKES):
                                                + tank_uspill[idx_lake, day] * jakkur_lake_quality_data['PO4-P'][day] 
                                                + untreated_volume_ww[idx_lake, day] * jakkur_wastewater_quality_data['PO4-P'][day])/(untreated_water_volume[idx_lake,day])
 
-         untreated_water_TP[idx_lake,day] = (tank_crunvol[idx_lake, day] * stormwater_quality_data['TP'][0] 
-                                               + tank_uspill[idx_lake, day] * jakkur_lake_quality_data['TP'][day] 
-                                               + untreated_volume_ww[idx_lake, day] * jakkur_wastewater_quality_data['TP'][day])/(untreated_water_volume[idx_lake,day])
+         # untreated_water_TP[idx_lake,day] = (tank_crunvol[idx_lake, day] * stormwater_quality_data['TP'][0] 
+         #                                       + tank_uspill[idx_lake, day] * jakkur_lake_quality_data['TP'][day] 
+         #                                       + untreated_volume_ww[idx_lake, day] * jakkur_wastewater_quality_data['TP'][day])/(untreated_water_volume[idx_lake,day])
 
 
 
@@ -255,10 +255,10 @@ total_effluent_tss = np.zeros((NB_LAKES , NB_DAYS,)) #tss concentration in the e
 total_effluent_cod = np.zeros((NB_LAKES , NB_DAYS,)) #cod concentration in the effluent of all the STP discharging in each lake
 total_effluent_bod = np.zeros((NB_LAKES , NB_DAYS,)) #bod concentration in the effluent of all the STP discharging in each lake
 total_effluent_nitrate = np.zeros((NB_LAKES , NB_DAYS,)) 
-total_effluent_TN = np.zeros((NB_LAKES , NB_DAYS,)) 
+# total_effluent_TN = np.zeros((NB_LAKES , NB_DAYS,)) 
 total_effluent_ammonia = np.zeros((NB_LAKES , NB_DAYS,)) 
 total_effluent_phosphate = np.zeros((NB_LAKES , NB_DAYS,)) 
-total_effluent_TP = np.zeros((NB_LAKES , NB_DAYS,)) 
+# total_effluent_TP = np.zeros((NB_LAKES , NB_DAYS,)) 
         
 
 #calculate pollutant concentrations of the effluent of each STP for each day of the year for each lake
@@ -273,10 +273,10 @@ for idx_lake in range(0, NB_LAKES):
     effluent_cod = np.zeros((1,nstps))
     effluent_bod = np.zeros((1,nstps))
     effluent_nitrate = np.zeros((1,nstps))
-    effluent_TN = np.zeros((1,nstps))
+    # effluent_TN = np.zeros((1,nstps))
     effluent_ammonia = np.zeros((1,nstps))
     effluent_phosphate = np.zeros((1,nstps))
-    effluent_TP = np.zeros((1,nstps))
+    # effluent_TP = np.zeros((1,nstps))
     
     for day in range(0, NB_DAYS): 
         for istp in range(0, nstps):
@@ -287,29 +287,29 @@ for idx_lake in range(0, NB_LAKES):
             i_tss = jakkur_wastewater_quality_data['TSS'][day]
             i_cod = jakkur_wastewater_quality_data['COD'][day]
             i_bod = jakkur_wastewater_quality_data['BOD'][day]
-            i_nitrate = jakkur_wastewater_quality_data['NO3-N'][day]
-            i_TN = jakkur_wastewater_quality_data['NH4-N'][day]
-            i_ammonia = jakkur_wastewater_quality_data['TN'][day]
+            i_nitrate = jakkur_wastewater_quality_data['Nitrate'][day]
+            # i_TN = jakkur_wastewater_quality_data['TN'][day]
+            i_ammonia = jakkur_wastewater_quality_data['NH4-N'][day]
             i_phosphate = jakkur_wastewater_quality_data['PO4-P'][day]
-            i_TP = jakkur_wastewater_quality_data['TP'][day]
-            f_tss, f_cod, f_bod, f_nitrate, f_TN, f_ammonia, f_phosphate, f_TP = process_efficiency(stp_type, i_tss, i_cod, i_bod, i_nitrate, i_TN, i_ammonia, i_phosphate, i_TP)
+            # i_TP = jakkur_wastewater_quality_data['TP'][day]
+            f_tss, f_cod, f_bod, f_nitrate, f_ammonia, f_phosphate = process_efficiency_2(stp_type, i_tss, i_cod, i_bod, i_nitrate, i_ammonia, i_phosphate)
             effluent_tss[istp] = f_tss
             effluent_cod[istp] = f_cod
             effluent_bod[istp] = f_bod
             effluent_nitrate[istp] = f_nitrate
-            effluent_TN[istp] = f_TN
+            # effluent_TN[istp] = f_TN
             effluent_ammonia[istp] = f_ammonia
             effluent_phosphate[istp] = f_phosphate
-            effluent_TP[istp] = f_TP
+            # effluent_TP[istp] = f_TP
             
         total_effluent_tss[idx_lake,day] = ((effluent_tss * volume_treated_stp).sum())/treated_volume_ww[idx_lake, day]
         total_effluent_cod[idx_lake,day] = ((effluent_cod * volume_treated_stp).sum())/treated_volume_ww[idx_lake, day]
         total_effluent_bod[idx_lake,day] = ((effluent_bod * volume_treated_stp).sum())/treated_volume_ww[idx_lake, day]
         total_effluent_nitrate[idx_lake,day] = ((effluent_nitrate * volume_treated_stp).sum())/treated_volume_ww[idx_lake, day]
-        total_effluent_TN[idx_lake,day] = ((effluent_TN * volume_treated_stp).sum())/treated_volume_ww[idx_lake, day]
+        #total_effluent_TN[idx_lake,day] = ((effluent_TN * volume_treated_stp).sum())/treated_volume_ww[idx_lake, day]
         total_effluent_ammonia[idx_lake,day] = ((effluent_ammonia * volume_treated_stp).sum())/treated_volume_ww[idx_lake, day]
         total_effluent_phosphate[idx_lake,day] = ((effluent_phosphate * volume_treated_stp).sum())/treated_volume_ww[idx_lake, day]
-        total_effluent_TP[idx_lake,day] = ((effluent_TP * volume_treated_stp).sum())/treated_volume_ww[idx_lake, day]
+        #total_effluent_TP[idx_lake,day] = ((effluent_TP * volume_treated_stp).sum())/treated_volume_ww[idx_lake, day]
         
         
 
@@ -324,20 +324,20 @@ wetland_inlet_tss = np.zeros((NB_LAKES , NB_DAYS,))
 wetland_inlet_cod = np.zeros((NB_LAKES , NB_DAYS,)) 
 wetland_inlet_bod = np.zeros((NB_LAKES , NB_DAYS,)) 
 wetland_inlet_nitrate = np.zeros((NB_LAKES , NB_DAYS,)) 
-wetland_inlet_TN = np.zeros((NB_LAKES , NB_DAYS,)) 
+#wetland_inlet_TN = np.zeros((NB_LAKES , NB_DAYS,)) 
 wetland_inlet_ammonia = np.zeros((NB_LAKES , NB_DAYS,)) 
 wetland_inlet_phosphate = np.zeros((NB_LAKES , NB_DAYS,)) 
-wetland_inlet_TP = np.zeros((NB_LAKES , NB_DAYS,)) 
+#wetland_inlet_TP = np.zeros((NB_LAKES , NB_DAYS,)) 
 
  
 wetland_outlet_tss = np.zeros((NB_LAKES , NB_DAYS,)) 
 wetland_outlet_cod = np.zeros((NB_LAKES , NB_DAYS,)) 
 wetland_outlet_bod = np.zeros((NB_LAKES , NB_DAYS,)) 
 wetland_outlet_nitrate = np.zeros((NB_LAKES , NB_DAYS,)) 
-wetland_outlet_TN = np.zeros((NB_LAKES , NB_DAYS,)) 
+#wetland_outlet_TN = np.zeros((NB_LAKES , NB_DAYS,)) 
 wetland_outlet_ammonia = np.zeros((NB_LAKES , NB_DAYS,)) 
 wetland_outlet_phosphate = np.zeros((NB_LAKES , NB_DAYS,)) 
-wetland_outlet_TP = np.zeros((NB_LAKES , NB_DAYS,)) 
+#wetland_outlet_TP = np.zeros((NB_LAKES , NB_DAYS,)) 
 
 p = np.zeros(NB_LAKES) 
 
@@ -360,21 +360,21 @@ for idx_lake in range(0, NB_LAKES):
        wetland_inlet_cod[idx_lake,day] = (total_effluent_cod[idx_lake,day] * treated_volume_ww[idx_lake, day] + untreated_water_cod[idx_lake,day]* volume_rw_wetland[idx_lake,day])/ total_volume_wetland[idx_lake,day]
        wetland_inlet_bod[idx_lake,day] = (total_effluent_bod[idx_lake,day] * treated_volume_ww[idx_lake, day] + untreated_water_bod[idx_lake,day]* volume_rw_wetland[idx_lake,day])/ total_volume_wetland[idx_lake,day]
        wetland_inlet_nitrate[idx_lake,day] = (total_effluent_nitrate[idx_lake,day] * treated_volume_ww[idx_lake, day] + untreated_water_nitrate[idx_lake,day]* volume_rw_wetland[idx_lake,day])/ total_volume_wetland[idx_lake,day]
-       wetland_inlet_TN[idx_lake,day] = (total_effluent_TN[idx_lake,day] * treated_volume_ww[idx_lake, day] + untreated_water_TN[idx_lake,day]* volume_rw_wetland[idx_lake,day])/ total_volume_wetland[idx_lake,day]
+       #wetland_inlet_TN[idx_lake,day] = (total_effluent_TN[idx_lake,day] * treated_volume_ww[idx_lake, day] + untreated_water_TN[idx_lake,day]* volume_rw_wetland[idx_lake,day])/ total_volume_wetland[idx_lake,day]
        wetland_inlet_ammonia[idx_lake,day] = (total_effluent_ammonia[idx_lake,day] * treated_volume_ww[idx_lake, day] + untreated_water_ammonia[idx_lake,day]* volume_rw_wetland[idx_lake,day])/ total_volume_wetland[idx_lake,day]
        wetland_inlet_phosphate[idx_lake,day] = (total_effluent_phosphate[idx_lake,day] * treated_volume_ww[idx_lake, day] + untreated_water_phosphate[idx_lake,day]* volume_rw_wetland[idx_lake,day])/ total_volume_wetland[idx_lake,day] 
-       wetland_inlet_TP[idx_lake,day] = (total_effluent_TP[idx_lake,day] * treated_volume_ww[idx_lake, day] + untreated_water_TP[idx_lake,day]* volume_rw_wetland[idx_lake,day])/ total_volume_wetland[idx_lake,day]
+       #wetland_inlet_TP[idx_lake,day] = (total_effluent_TP[idx_lake,day] * treated_volume_ww[idx_lake, day] + untreated_water_TP[idx_lake,day]* volume_rw_wetland[idx_lake,day])/ total_volume_wetland[idx_lake,day]
        
        tss = wetland_inlet_tss[idx_lake,day] 
        cod = wetland_inlet_cod[idx_lake,day] 
        bod = wetland_inlet_bod[idx_lake,day]
        nitrate = wetland_inlet_nitrate[idx_lake,day] 
-       TN = wetland_inlet_TN[idx_lake,day]
+       #TN = wetland_inlet_TN[idx_lake,day]
        ammonia = wetland_inlet_ammonia[idx_lake,day] 
        phosphate = wetland_inlet_phosphate[idx_lake,day]
-       TP = wetland_inlet_TP[idx_lake,day]
+       #TP = wetland_inlet_TP[idx_lake,day]
        
-       wetland_outlet_tss[idx_lake,day], wetland_outlet_cod[idx_lake,day], wetland_outlet_bod[idx_lake,day], wetland_outlet_nitrate[idx_lake,day],wetland_outlet_TN[idx_lake,day], wetland_outlet_ammonia[idx_lake,day], wetland_outlet_phosphate[idx_lake,day], wetland_outlet_TP[idx_lake,day] = wetland_efficiency(tss, cod, bod, nitrate, TN, ammonia, phosphate, TP)
+       wetland_outlet_tss[idx_lake,day], wetland_outlet_cod[idx_lake,day], wetland_outlet_bod[idx_lake,day], wetland_outlet_nitrate[idx_lake,day], wetland_outlet_ammonia[idx_lake,day], wetland_outlet_phosphate[idx_lake,day] = wetland_efficiency_2(tss, cod, bod, nitrate, ammonia, phosphate)
        
       
 
@@ -412,10 +412,10 @@ total_inflow_tss = np.zeros((NB_LAKES , NB_DAYS,)) #tss concentration in the inf
 total_inflow_cod = np.zeros((NB_LAKES , NB_DAYS,)) #cod concentration in the inflow of each lake
 total_inflow_bod = np.zeros((NB_LAKES , NB_DAYS,)) #bod concentration in the inflow of each lake
 total_inflow_nitrate = np.zeros((NB_LAKES , NB_DAYS,))
-total_inflow_TN = np.zeros((NB_LAKES , NB_DAYS,))
+#total_inflow_TN = np.zeros((NB_LAKES , NB_DAYS,))
 total_inflow_ammonia = np.zeros((NB_LAKES , NB_DAYS,))
 total_inflow_phosphate = np.zeros((NB_LAKES , NB_DAYS,))
-total_inflow_TP = np.zeros((NB_LAKES , NB_DAYS,))
+#total_inflow_TP = np.zeros((NB_LAKES , NB_DAYS,))
 
 
 for idx_lake in range(0, NB_LAKES):
@@ -432,8 +432,8 @@ for idx_lake in range(0, NB_LAKES):
         total_inflow_nitrate[idx_lake, day] = (wetland_outlet_nitrate[idx_lake,day] * total_volume_wetland[idx_lake, day]
                                           + untreated_water_nitrate[idx_lake,day] * tank_inflow[idx_lake, day])/ total_tank_inflow[idx_lake, day]
  
-        total_inflow_TN[idx_lake, day] = (wetland_outlet_TN[idx_lake,day] * total_volume_wetland[idx_lake, day]
-                                          + untreated_water_TN[idx_lake,day] * tank_inflow[idx_lake, day])/ total_tank_inflow[idx_lake, day]
+        #total_inflow_TN[idx_lake, day] = (wetland_outlet_TN[idx_lake,day] * total_volume_wetland[idx_lake, day]
+                                          #+ untreated_water_TN[idx_lake,day] * tank_inflow[idx_lake, day])/ total_tank_inflow[idx_lake, day]
     
         total_inflow_ammonia[idx_lake, day] = (wetland_outlet_ammonia[idx_lake,day] * total_volume_wetland[idx_lake, day]
                                           + untreated_water_ammonia[idx_lake,day] * tank_inflow[idx_lake, day])/ total_tank_inflow[idx_lake, day]
@@ -443,8 +443,8 @@ for idx_lake in range(0, NB_LAKES):
                                           + untreated_water_phosphate[idx_lake,day] * tank_inflow[idx_lake, day])/ total_tank_inflow[idx_lake, day]
     
     
-        total_inflow_TP[idx_lake, day] = (wetland_outlet_TP[idx_lake,day] * total_volume_wetland[idx_lake, day]
-                                          + untreated_water_TP[idx_lake,day] * tank_inflow[idx_lake, day])/ total_tank_inflow[idx_lake, day]
+        #total_inflow_TP[idx_lake, day] = (wetland_outlet_TP[idx_lake,day] * total_volume_wetland[idx_lake, day]
+                                         # + untreated_water_TP[idx_lake,day] * tank_inflow[idx_lake, day])/ total_tank_inflow[idx_lake, day]
     
     
     
@@ -506,7 +506,7 @@ for idx_lake in range (NB_LAKES):
 #%%
 ################################################################################################################################
 #Table Visualization of results for Jakkur lake & Jakkur STP
-times = pd.Series(pd.date_range('2021', periods=365, freq='D'))
+times = pd.Series(pd.date_range('2021', periods=184, freq='D'))
 np.array(times)
                   
 jakkur_wastewater_quality_data.plot(x="Date",y="BOD")
@@ -564,11 +564,10 @@ year_BOD_values.save()
 
 
 #Plot visualisation of results for jakkur lake & Jakkur STP
-days = np.arange(1,366,1)
+days = np.arange(1,185,1)
 year_table.insert(0, "Days", days)
 year_table.insert(1, "General BOD discharge standard (mg/L)", 30)
 year_table.insert(1, "Target BOD discharge standard (mg/L)", 10)
-
 
 
 year_table.plot(x='Days' , y=["BOD in wastewater (mg/L)", 'Experimental BOD in STP effluent (mg/L)'],title = 'Results with UASB+EA technology',grid = "on")
@@ -578,13 +577,13 @@ year_table.plot(x='Days' , y=["BOD in wastewater (mg/L)", 'Modelled BOD in STP e
 plt.show()
 
 
-year_table.plot(x='Days' , y=['Modelled BOD in STP effluent (mg/L)', 'Experimental BOD in STP effluent (mg/L)'],title = 'Results with UASB+EA technology',grid = "on")
+year_table.plot(x='Days' , y=['Modelled BOD in STP effluent (mg/L)', 'Experimental BOD in STP effluent (mg/L)',"Target BOD discharge standard (mg/L)","General BOD discharge standard (mg/L)"],title = 'Results with UASB+EA technology',grid = "on")
 plt.show()
 
-year_table.plot(x='Days' , y=['Modelled BOD in wetland effluent (mg/L)', 'Experimental BOD in wetland effluent (mg/L)'], title = 'Results with '+ str(p[17]) +'% of untreated water passing through the wetland', grid = "on")
+year_table.plot(x='Days' , y=['Modelled BOD in wetland effluent (mg/L)', 'Experimental BOD in wetland effluent (mg/L)',"Target BOD discharge standard (mg/L)","General BOD discharge standard (mg/L)"], title = 'Results with '+ str(p[17]) +'% of untreated water passing through the wetland', grid = "on")
 plt.show()
 
-year_table.plot(x='Days' , y=['Experimental BOD in wetland effluent (mg/L)', 'Experimental BOD in STP effluent (mg/L)'], title = 'Results with '+ str(p[17]) +'% of untreated water passing through the wetland', grid = "on")
+year_table.plot(x='Days' , y=['Experimental BOD in wetland effluent (mg/L)', 'Experimental BOD in STP effluent (mg/L)',"Target BOD discharge standard (mg/L)","General BOD discharge standard (mg/L)"], title = 'Results with '+ str(p[17]) +'% of untreated water passing through the wetland', grid = "on")
 plt.show()
 
 
