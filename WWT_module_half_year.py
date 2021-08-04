@@ -114,9 +114,9 @@ jakkur_lake_quality_data = pd.read_csv(lake_quality_path, sep=";",
 
 #data of experimental concentrations in STP effluent 
 
-stp_effleunt_path = os.path.join(input_dir, "STP_effluent_exp_2016.csv")
+stp_effluent_path = os.path.join(input_dir, "STP_effluent_exp_2016.csv")
 
-stp_effluent_exp_data = pd.read_csv(stp_effleunt_path, sep=";",
+stp_effluent_exp_data = pd.read_csv(stp_effluent_path, sep=";",
                         dtype={'Date':'str', 'TSS':'float64', 'BOD':'float64','COD':'float64',
                        'Nitrates':'float64', 'NH4-N':'float64', 
                        'PO4-P':'float64'})
@@ -125,9 +125,9 @@ stp_effluent_exp_data = pd.read_csv(stp_effleunt_path, sep=";",
 
 #data of experimental concentrations in wetland effleunt
 
-wetland_effleunt_path = os.path.join(input_dir, "wetland_effluent_exp_half_year.csv")
+wetland_effluent_path = os.path.join(input_dir, "wetland_effluent_exp_half_year.csv")
 
-wetland_effluent_exp_data = pd.read_csv(wetland_effleunt_path, sep=";",
+wetland_effluent_exp_data = pd.read_csv(wetland_effluent_path, sep=";",
                         dtype={'Date':'str', 'TSS':'float64', 'BOD':'float64','COD':'float64','NO3-N':'float64',
                        'Nitrates':'float64', 'NH4-N':'float64', 
                        'TN':'float64','PO4-P':'float64','TP':'float64'})

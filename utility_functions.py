@@ -27,8 +27,8 @@ def process_efficiency(stp_type, tss, cod , bod, nitrate, TN, ammonia, phosphate
     """
     take the WW imput parameters and the operating conditions to return the output pollutant concentration
     """
-    if stp_type == 'ASP':
-        f_tss, f_cod, f_bod, f_nitrate, f_TN, f_ammonia, f_phosphate, f_TP  = asp_function(tss, cod, bod, nitrate, TN, ammonia, phosphate, TP)
+    if stp_type == 'CAS':
+        f_tss, f_cod, f_bod, f_nitrate, f_TN, f_ammonia, f_phosphate, f_TP  = cas_function(tss, cod, bod, nitrate, TN, ammonia, phosphate, TP)
         
     elif stp_type == 'EA':
         f_tss, f_cod, f_bod, f_nitrate, f_TN, f_ammonia, f_phosphate, f_TP  = ea_function(tss, cod, bod, nitrate, TN, ammonia, phosphate, TP)
@@ -36,7 +36,6 @@ def process_efficiency(stp_type, tss, cod , bod, nitrate, TN, ammonia, phosphate
     elif stp_type == 'UASB':
         f_tss, f_cod, f_bod, f_nitrate, f_TN, f_ammonia, f_phosphate, f_TP  = uasb_function(tss, cod, bod, nitrate, TN, ammonia, phosphate, TP)
         
-    
     elif stp_type == 'SBR':
         f_tss, f_cod, f_bod, f_nitrate, f_TN, f_ammonia, f_phosphate, f_TP  = sbr_function(tss, cod, bod, nitrate, TN, ammonia, phosphate, TP)
     
@@ -76,7 +75,7 @@ def wetland_efficiency(tss, cod, bod, nitrate, TN, ammonia, phosphate, TP):
     f_TP = (1-0.70) * TP
     return f_tss,f_cod,f_bod, f_nitrate, f_TN, f_ammonia, f_phosphate, f_TP
 
-def asp_function(tss, cod, bod, nitrate, TN, ammonia, phosphate, TP):
+def cas_function(tss, cod, bod, nitrate, TN, ammonia, phosphate, TP):
     f_tss = (1-0.80) * tss
     f_cod = (1-0.83) * cod
     f_bod = (1-0.86) * bod
@@ -192,7 +191,7 @@ def process_cost(stp_type,stp_capacity,treated_volume,design_BOD, treated_BOD):
         O_M_costs = 457 * treated_volume**(-0.49) * 365
         
     
-    elif stp_type == 'ASP':
+    elif stp_type == 'CAS':
         capital_costs = 0.206 * (design_PE * 10**(-3))**(0.954) * 10**(6)
         O_M_costs = 0.022 * (treated_PE* 10**(-3))**(0.672) * 10**(6)
         
@@ -236,13 +235,14 @@ def process_cost(stp_type,stp_capacity,treated_volume,design_BOD, treated_BOD):
        
 
 ########################################################################################
+#function for the half-year study period
 
 def process_efficiency_2(stp_type, tss, cod , bod, nitrate, ammonia, phosphate, ):
     """
     take the WW imput parameters and the operating conditions to return the output pollutant concentration
     """
-    if stp_type == 'ASP':
-        f_tss, f_cod, f_bod, f_nitrate, f_ammonia, f_phosphate = asp_function(tss, cod, bod, nitrate, ammonia, phosphate)
+    if stp_type == 'CAS':
+        f_tss, f_cod, f_bod, f_nitrate, f_ammonia, f_phosphate = cas_function(tss, cod, bod, nitrate, ammonia, phosphate)
         
     elif stp_type == 'EA':
         f_tss, f_cod, f_bod, f_nitrate, f_ammonia, f_phosphate = ea_function(tss, cod, bod, nitrate, ammonia, phosphate)
