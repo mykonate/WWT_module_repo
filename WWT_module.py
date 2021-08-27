@@ -167,10 +167,10 @@ for day in range(NB_DAYS):
             untreated_volume_ww[idx_lake, day] += volume_ww[idx_lake, day] - treated_volume_ww[idx_lake, day]
         
         #SCS runoff volume
-        tank_crunvol[idx_lake, day] = tank_data_2[idx_lake]['tank_crunvol'][day]
+        tank_crunvol[idx_lake, day] = tank_data_2[idx_lake]['tank_crunvol'][day]*10**3 #in liters
         
         #upstream spill volume 
-        tank_uspill[idx_lake, day] = tank_data_2[idx_lake]['tank_uspill'][day]
+        tank_uspill[idx_lake, day] = tank_data_2[idx_lake]['tank_uspill'][day]*10**3   #in liters
     
 
 
@@ -211,34 +211,30 @@ for idx_lake in range(0, NB_LAKES):
             
             
         else:
-         untreated_water_tss[idx_lake,day] = (tank_crunvol[idx_lake, day] * stormwater_quality_data['TSS'][0] 
-                                             + tank_uspill[idx_lake, day] * jakkur_lake_quality_data['TSS'][day] 
-                                             + untreated_volume_ww[idx_lake, day] * jakkur_wastewater_quality_data['TSS'][day])/(untreated_water_volume[idx_lake,day]) 
+         untreated_water_tss[idx_lake,day] = (tank_crunvol[idx_lake, day] * stormwater_quality_data['TSS'][0] + tank_uspill[idx_lake, day] * jakkur_lake_quality_data['TSS'][day]  + untreated_volume_ww[idx_lake, day] * jakkur_wastewater_quality_data['TSS'][day])/(untreated_water_volume[idx_lake,day]) 
         
          untreated_water_cod[idx_lake,day] = (tank_crunvol[idx_lake, day] * stormwater_quality_data['COD'][0] 
-                                             + tank_uspill[idx_lake, day] * jakkur_lake_quality_data['COD'][day] 
-                                             + untreated_volume_ww[idx_lake, day] * jakkur_wastewater_quality_data['COD'][day])/(untreated_water_volume[idx_lake,day])
+                                              + tank_uspill[idx_lake, day] * jakkur_lake_quality_data['COD'][day] 
+                                              + untreated_volume_ww[idx_lake, day] * jakkur_wastewater_quality_data['COD'][day])/(untreated_water_volume[idx_lake,day])
 
         
-         untreated_water_bod[idx_lake,day] = (tank_crunvol[idx_lake, day] * stormwater_quality_data['BOD'][0] 
-                                              + tank_uspill[idx_lake, day] * jakkur_lake_quality_data['BOD'][day] 
-                                              + untreated_volume_ww[idx_lake, day] * jakkur_wastewater_quality_data['BOD'][day])/(untreated_water_volume[idx_lake,day])
+         untreated_water_bod[idx_lake,day] = (tank_crunvol[idx_lake, day] * stormwater_quality_data['BOD'][0] + tank_uspill[idx_lake, day] * jakkur_lake_quality_data['BOD'][day] + untreated_volume_ww[idx_lake, day] * jakkur_wastewater_quality_data['BOD'][day])/(untreated_water_volume[idx_lake,day])
           
          untreated_water_nitrate[idx_lake,day] = (tank_crunvol[idx_lake, day] * stormwater_quality_data['Nitrate'][0] 
-                                               + tank_uspill[idx_lake, day] * jakkur_lake_quality_data['Nitrate'][day] 
-                                               + untreated_volume_ww[idx_lake, day] * jakkur_wastewater_quality_data['Nitrate'][day])/(untreated_water_volume[idx_lake,day])
+                                                + tank_uspill[idx_lake, day] * jakkur_lake_quality_data['Nitrate'][day] 
+                                                + untreated_volume_ww[idx_lake, day] * jakkur_wastewater_quality_data['Nitrate'][day])/(untreated_water_volume[idx_lake,day])
 
          untreated_water_TN[idx_lake,day] = (tank_crunvol[idx_lake, day] * stormwater_quality_data['TN'][0] 
                                                + tank_uspill[idx_lake, day] * jakkur_lake_quality_data['TN'][day] 
                                                + untreated_volume_ww[idx_lake, day] * jakkur_wastewater_quality_data['TN'][day])/(untreated_water_volume[idx_lake,day])
 
          untreated_water_ammonia[idx_lake,day] = (tank_crunvol[idx_lake, day] * stormwater_quality_data['NH3-N'][0] 
-                                               + tank_uspill[idx_lake, day] * jakkur_lake_quality_data['NH4-N'][day] 
-                                               + untreated_volume_ww[idx_lake, day] * jakkur_wastewater_quality_data['NH4-N'][day])/(untreated_water_volume[idx_lake,day])
+                                                  + tank_uspill[idx_lake, day] * jakkur_lake_quality_data['NH4-N'][day] 
+                                                  + untreated_volume_ww[idx_lake, day] * jakkur_wastewater_quality_data['NH4-N'][day])/(untreated_water_volume[idx_lake,day])
 
          untreated_water_phosphate[idx_lake,day] = (tank_crunvol[idx_lake, day] * stormwater_quality_data['PO4-P'][0] 
-                                               + tank_uspill[idx_lake, day] * jakkur_lake_quality_data['PO4-P'][day] 
-                                               + untreated_volume_ww[idx_lake, day] * jakkur_wastewater_quality_data['PO4-P'][day])/(untreated_water_volume[idx_lake,day])
+                                                     + tank_uspill[idx_lake, day] * jakkur_lake_quality_data['PO4-P'][day] 
+                                                     + untreated_volume_ww[idx_lake, day] * jakkur_wastewater_quality_data['PO4-P'][day])/(untreated_water_volume[idx_lake,day])
 
          untreated_water_TP[idx_lake,day] = (tank_crunvol[idx_lake, day] * stormwater_quality_data['TP'][0] 
                                                + tank_uspill[idx_lake, day] * jakkur_lake_quality_data['TP'][day] 
@@ -439,17 +435,17 @@ for idx_lake in range(0, NB_LAKES):
                                           + untreated_water_bod[idx_lake,day] * tank_inflow[idx_lake, day])/ total_tank_inflow[idx_lake, day]
         
         total_inflow_nitrate[idx_lake, day] = (wetland_outlet_nitrate[idx_lake,day] * total_volume_wetland[idx_lake, day]
-                                          + untreated_water_nitrate[idx_lake,day] * tank_inflow[idx_lake, day])/ total_tank_inflow[idx_lake, day]
+                                               + untreated_water_nitrate[idx_lake,day] * tank_inflow[idx_lake, day])/ total_tank_inflow[idx_lake, day]
  
         total_inflow_TN[idx_lake, day] = (wetland_outlet_TN[idx_lake,day] * total_volume_wetland[idx_lake, day]
                                           + untreated_water_TN[idx_lake,day] * tank_inflow[idx_lake, day])/ total_tank_inflow[idx_lake, day]
     
         total_inflow_ammonia[idx_lake, day] = (wetland_outlet_ammonia[idx_lake,day] * total_volume_wetland[idx_lake, day]
-                                          + untreated_water_ammonia[idx_lake,day] * tank_inflow[idx_lake, day])/ total_tank_inflow[idx_lake, day]
+                                              + untreated_water_ammonia[idx_lake,day] * tank_inflow[idx_lake, day])/ total_tank_inflow[idx_lake, day]
     
     
         total_inflow_phosphate[idx_lake, day] = (wetland_outlet_phosphate[idx_lake,day] * total_volume_wetland[idx_lake, day]
-                                          + untreated_water_phosphate[idx_lake,day] * tank_inflow[idx_lake, day])/ total_tank_inflow[idx_lake, day]
+                                                + untreated_water_phosphate[idx_lake,day] * tank_inflow[idx_lake, day])/ total_tank_inflow[idx_lake, day]
     
     
         total_inflow_TP[idx_lake, day] = (wetland_outlet_TP[idx_lake,day] * total_volume_wetland[idx_lake, day]
@@ -470,24 +466,50 @@ for idx_lake in range(0, NB_LAKES):
 
 ########################################################################################################################
 
-#Cost functions 
+#Cost module
 
-average_BOD = (jakkur_wastewater_quality_data['BOD'].sum())/NB_DAYS
+average_influent_BOD = (jakkur_wastewater_quality_data['BOD'].mean())/1000 #average influent BOD in kg/m3
 capital_costs = np.zeros((NB_STP ,1 ))
 O_M_costs = np.zeros((NB_STP ,1 ))
 
+
 for istp in range (0,NB_STP):
-    design_BOD = stp_data['capacity_volume'][istp] * average_BOD
-    treated_BOD = stp_data['capacity_volume'][istp] * stp_data['percentage_utilisation'][istp] * average_BOD
+    # design_BOD = stp_data['capacity_volume'][istp] * average_BOD
+    # treated_BOD = stp_data['capacity_volume'][istp] * stp_data['percentage_utilisation'][istp] * average_BOD
     stp_type = str(stp_data['technologies_type'][istp])
-    stp_capacity = stp_data['capacity_volume'][istp]
-    treated_volume = stp_data['capacity_volume'][istp] * stp_data['percentage_utilisation'][istp]
-    capital_costs[istp],O_M_costs[istp] = total_cost(stp_type,stp_capacity,treated_volume,design_BOD, treated_BOD )
+    idx_lake = stp_data['lake_ID'][istp]
+    nb_inhabitant = tank_data['catch_pop'][idx_lake - 1]
+    # stp_capacity = stp_data['capacity_volume'][istp]
+    # treated_volume = stp_data['capacity_volume'][istp] * stp_data['percentage_utilisation'][istp]
+    capital_costs[istp],O_M_costs[istp] = total_cost(stp_type,nb_inhabitant)
     
     print(capital_costs, O_M_costs)
-    
-    
 
+#%%    
+#########################################################################################################################
+#results MSc Thesis
+# technologie_table = pd.DataFrame([total_effluent_tss[17,:],total_effluent_cod[17,:],total_effluent_bod[17,:], total_effluent_nitrate[17,:], total_effluent_TN[17,:], total_effluent_ammonia[17,:], total_effluent_phosphate[17,:]])
+# print(technologie_table)
+#create output as csv files
+import itertools
+
+
+outcalc = [total_effluent_tss[17,:],total_effluent_cod[17,:],total_effluent_bod[17,:],total_effluent_nitrate[17,:], total_effluent_TN[17,:], total_effluent_ammonia[17,:], total_effluent_phosphate[17,:],total_effluent_TP[17,:]]  
+
+    
+flat = np.array(outcalc)
+transp = flat.T
+outtech = "UASB+EA.csv"
+outfile = os.path.join(output, outtech)
+    
+with open(outfile, 'w') as f:
+        writerh = csv.DictWriter(f, fieldnames = ["TSS", "COD", "BOD", "nitrate", "TN", 
+                                                  "ammonia", "phosphate","TP"], delimiter = ',')
+        writerh.writeheader()
+        writer = csv.writer(f)
+        writer.writerows(transp)
+        
+#%%
 ########################################################################################################################
 #create output as csv files
 import itertools
@@ -519,29 +541,38 @@ for idx_lake in range (NB_LAKES):
 times = pd.Series(pd.date_range('2021', periods=365, freq='D'))
 np.array(times)
                   
-jakkur_wastewater_quality_data.plot(x="Date",y="BOD")
-plt.show()
 
-year_table = pd.DataFrame([jakkur_wastewater_quality_data['BOD'],total_effluent_bod[17,:], stp_effluent_exp_data['BOD'], wetland_outlet_bod[17,:],wetland_effluent_exp_data['BOD']]).T
-year_table.columns = ['BOD in wastewater (mg/L)','Modelled BOD in STP effluent (mg/L)','Experimental BOD in STP effluent (mg/L)', 'Modelled BOD in wetland effluent (mg/L)', 'Experimental BOD in wetland effluent (mg/L)']
-year_table.index = pd.Index(times,name = 'Date')
+year_table_BOD = pd.DataFrame([jakkur_wastewater_quality_data['BOD'],total_effluent_bod[17,:], stp_effluent_exp_data['BOD'], wetland_outlet_bod[17,:],wetland_effluent_exp_data['BOD']]).T
+year_table_BOD.columns = ['BOD in wastewater (mg/L)','Modelled BOD in STP effluent (mg/L)','Measured BOD in STP effluent (mg/L)', 'Modelled BOD in wetland effluent (mg/L)', 'Measured BOD in wetland effluent (mg/L)']
+year_table_BOD.index = pd.Index(times,name = 'Date')
 
-year_table.style.set_caption("Results with " + str(p[17]) + "% of untreated water entering the wetland")
+year_table_BOD.style.set_caption("Results with " + str(p[17]) + "% of untreated water entering the wetland")
+
+year_table_ammonia = pd.DataFrame([jakkur_wastewater_quality_data['NH4-N'],total_effluent_ammonia[17,:], stp_effluent_exp_data['NH4-N'], wetland_outlet_ammonia[17,:],wetland_effluent_exp_data['NH4-N']]).T
+year_table_ammonia.columns = ['ammonia in wastewater (mg/L)','Modelled ammonia in STP effluent (mg/L)','Measured ammonia in STP effluent (mg/L)', 'Modelled ammonia in wetland effluent (mg/L)', 'Measured ammonia in wetland effluent (mg/L)']
+year_table_ammonia.index = pd.Index(times,name = 'Date')
+
+year_table_ammonia.style.set_caption("Results with " + str(p[17]) + "% of untreated water entering the wetland")
 
 # Create a Pandas Excel writer using XlsxWriter as the engine
 year_BOD_values = pd.ExcelWriter('BOD-Values.xlsx', engine='xlsxwriter')
+year_ammonia_values = pd.ExcelWriter('ammonia-Values.xlsx', engine='xlsxwriter')
 
 # Convert the dataframe to an XlsxWriter Excel object.
-year_table.to_excel(year_BOD_values,sheet_name = 'BOD')
+year_table_BOD.to_excel(year_BOD_values,sheet_name = 'BOD')
+year_table_ammonia.to_excel(year_ammonia_values, sheet_name = 'ammonia')
+
 
 # Get the xlsxwriter workbook and worksheet objects.
 workbook  = year_BOD_values.book
 worksheet = year_BOD_values.sheets['BOD']
+workbook_2 = year_ammonia_values.book
+worksheet_2 = year_ammonia_values.sheets['ammonia']
 
 # Set the conditional format range.
 start_row = 4
 start_col = 1
-end_row = len(year_table)+3
+end_row = len(year_table_BOD)+3
 end_cold = 4
 
 # Add a format. Light red fill with dark red text.
@@ -553,59 +584,102 @@ format2 = workbook.add_format({'bg_color': '#FF97306',
                                'font_color': '#9C2700'})
 
 # Apply a conditional format to the cell range.
-worksheet.conditional_format(start_row, start_col, end_row, end_cold, {'type':'cell','criteria':'>','value':'10', 'format':format2})
+worksheet.conditional_format(start_row, start_col, end_row, end_cold, {'type':'cell','criteria':'between','minimum':10,'maximum':30, 'format':format2})
 worksheet.conditional_format(start_row, start_col, end_row, end_cold, {'type':'cell','criteria':'>','value':'30', 'format':format1})
 
 # Close the Pandas Excel writer and output the Excel file.
 year_BOD_values.save()
+year_ammonia_values.save()
 
-#alternative way to present the table
-# fig = plt.figure(figsize = (10, 2))
-# ax = fig.add_subplot(111)
 
-# ax.table(cellText = year_table.values,
-#           rowLabels = year_table.index,
-#           colLabels = year_table.columns,
-#           loc = "center"
-#          )
-# ax.set_title("")
-
-# ax.axis("off");
 
 
 #Plot visualisation of results for jakkur lake & Jakkur STP
 days = np.arange(1,366,1)
-year_table.insert(0, "Days", days)
-year_table.insert(1, "General BOD discharge standard (mg/L)", 30)
-year_table.insert(1, "Target BOD discharge standard (mg/L)", 10)
+year_table_BOD.insert(0, "Days", days)
+year_table_BOD.insert(1, "General BOD discharge standard (mg/L)", 30)
+year_table_BOD.insert(1, "Target BOD discharge standard (mg/L)", 10)
+tech = str(stp_data['technologies_type'][0])
+
+year_table_ammonia.insert(0, "Days", days)
+year_table_ammonia.insert(1, "General ammonia discharge standard (mg/L)", 30)
+year_table_ammonia.insert(1, "Target ammonia discharge standard (mg/L)", 10)
 
 
+# year_table_BOD.plot(x='Days' , y=["BOD in wastewater (mg/L)", 'Measured BOD in STP effluent (mg/L)'],title = 'Results with '+ str(tech) +' technology',grid = "on")
+# plt.show()
 
-year_table.plot(x='Days' , y=["BOD in wastewater (mg/L)", 'Experimental BOD in STP effluent (mg/L)'],title = 'Results with '+ str(stp_data['technologies_type']) +' technology',grid = "on")
+# year_table_BOD.plot(x='Days' , y=["BOD in wastewater (mg/L)", 'Modelled BOD in STP effluent (mg/L)'],title = 'Results with '+ str(tech) +' technology',grid = "on")
+# plt.show()
+# 'Results with '+ str(tech) +' technology'
+
+year_table_BOD.plot(x='Days' , y=['Modelled BOD in STP effluent (mg/L)', 'Measured BOD in STP effluent (mg/L)',],title = 'Modelled Vs Measured BOD in Jakkur STP effluent' ,grid = "on")
+plt.legend(loc='upper right', fontsize=9)
+plt.xlim(0,365)
+plt.ylim(0,50)
+plt.ylabel('concentration in mg/lL')
 plt.show()
 
-year_table.plot(x='Days' , y=["BOD in wastewater (mg/L)", 'Modelled BOD in STP effluent (mg/L)'],title = 'Results with '+ str(stp_data['technologies_type']) +' technology',grid = "on")
+year_table_BOD.plot(x='Days' , y=['Modelled BOD in wetland effluent (mg/L)', 'Measured BOD in wetland effluent (mg/L)'], title = 'Modelled Vs Measured BOD in Jakkur wetland effluent \n with '+ str(p[17]) +'% of untreated water passing through the wetland', grid = "on")
+plt.legend(loc='upper left', fontsize=9)
+plt.xlim(0,365)
+plt.ylim(0,50)
+plt.ylabel('concentration in mg/lL')
+plt.show()
+
+year_table_BOD.plot(x='Days' , y=['Measured BOD in STP effluent (mg/L)', 'Measured BOD in wetland effluent (mg/L)'], title = 'Comparison betwen measured BOD \n in Jakkur STP and Jakkur wetland effluents', grid = "on", color =('g','r'))
+plt.legend(loc='upper left', fontsize=9)
+plt.xlim(0,365)
+plt.ylim(0,50)
+plt.ylabel('concentration in mg/lL')
+plt.show()
+
+# year_table_BOD.plot(x='Days' , y=['Measured BOD in wetland effluent (mg/L)', 'Measured BOD in STP effluent (mg/L)'], title = 'Results with '+ str(p[17]) +'% of untreated water passing through the wetland', grid = "on")
+# plt.show()
+
+
+# year_table_BOD.plot(x='Days' , y=['Modelled BOD in wetland effluent (mg/L)', 'Modelled BOD in STP effluent (mg/L)'], title = 'Results with '+ str(p[17]) +'% of untreated water passing through the wetland', grid = "on")
+# plt.show()
+
+year_table_ammonia.plot(x='Days' , y=['Modelled ammonia in STP effluent (mg/L)', 'Measured ammonia in STP effluent (mg/L)'],title = 'Modelled Vs Measured ammonia in Jakkur STP effluent ',grid = "on")
+plt.legend(loc='upper right', fontsize=9)
+plt.xlim(0,365)
+plt.ylim(0,70)
+plt.ylabel('concentration in mg/lL')
+plt.show()
+
+year_table_ammonia.plot(x='Days' , y=['Modelled ammonia in wetland effluent (mg/L)', 'Measured ammonia in wetland effluent (mg/L)'], title = 'Modelled Vs Measured ammonia in Jakkur wetland effluent \n with '+ str(p[17]) +'% of untreated water passing through the wetland', grid = "on")
+plt.legend(loc='upper left', fontsize=9)
+plt.xlim(0,365)
+plt.ylim(0,70)
+plt.ylabel('concentration in mg/lL')
+plt.show()
+
+year_table_ammonia.plot(x='Days' , y=['Measured ammonia in STP effluent (mg/L)', 'Measured ammonia in wetland effluent (mg/L)'], title = 'Comparison betwen measured ammonia \n in Jakkur STP and Jakkur wetland effluents ', grid = "on", color =('g','r'))
+plt.legend(loc='upper left', fontsize=9)
+plt.xlim(0,365)
+plt.ylim(0,60)
+plt.ylabel('concentration in mg/lL')
 plt.show()
 
 
-year_table.plot(x='Days' , y=['Modelled BOD in STP effluent (mg/L)', 'Experimental BOD in STP effluent (mg/L)',"Target BOD discharge standard (mg/L)"],title = 'Results with MBBR technology',grid = "on")
-plt.show()
-
-year_table.plot(x='Days' , y=['Modelled BOD in wetland effluent (mg/L)', 'Experimental BOD in wetland effluent (mg/L)',"Target BOD discharge standard (mg/L)"], title = 'Results with '+ str(p[17]) +'% of untreated water passing through the wetland', grid = "on")
-plt.show()
-
-year_table.plot(x='Days' , y=['Experimental BOD in wetland effluent (mg/L)', 'Experimental BOD in STP effluent (mg/L)'], title = 'Results with '+ str(p[17]) +'% of untreated water passing through the wetland', grid = "on")
-plt.show()
 
 
-year_table.plot(x='Days' , y=['Modelled BOD in wetland effluent (mg/L)', 'Modelled BOD in STP effluent (mg/L)'], title = 'Results with '+ str(p[17]) +'% of untreated water passing through the wetland', grid = "on")
-plt.show()
+relative_BOD_STP_error = ((year_table_BOD['Measured BOD in STP effluent (mg/L)'].mean()-year_table_BOD['Modelled BOD in STP effluent (mg/L)'].mean())/year_table_BOD['Measured BOD in STP effluent (mg/L)'].mean())
+print(relative_BOD_STP_error)
 
+relative_BOD_wetland_error = ((year_table_BOD['Measured BOD in wetland effluent (mg/L)'].mean()-year_table_BOD['Modelled BOD in wetland effluent (mg/L)'].mean())/year_table_BOD['Measured BOD in wetland effluent (mg/L)'].mean())
+print(relative_BOD_wetland_error)
 
+relative_ammonia_STP_error = ((year_table_ammonia['Measured ammonia in STP effluent (mg/L)'].mean()-year_table_ammonia['Modelled ammonia in STP effluent (mg/L)'].mean())/year_table_ammonia['Measured ammonia in STP effluent (mg/L)'].mean())
+print(relative_ammonia_STP_error)
+
+relative_ammonia_wetland_error = ((year_table_ammonia['Measured ammonia in wetland effluent (mg/L)'].mean()-year_table_ammonia['Modelled ammonia in wetland effluent (mg/L)'].mean())/year_table_ammonia['Measured ammonia in wetland effluent (mg/L)'].mean())
+print(relative_ammonia_wetland_error)
 ############################################################################
 #%%
 #Multi-Criteria Analysis with the Weighted_Sum_model
-technology_table = ['CAS','EA','SBR','MBR','MBBR','ABR','UASB','UASB+EA']
+technology_table = ['CAS','EA','SBR','MBR','MBBR','ABR','UASB','UASB+EA','UASB+SBR','UASB+MBR','UASB+MBBR','SFCW']
 nb_tech = len(technology_table) 
 
 
@@ -647,15 +721,18 @@ MCA_total_score = np.zeros((nb_tech))
 MCA_rank = np.zeros((nb_tech))
 
 
-print("For which capacity (in m3/d) would you like to design the STP")
-MCA_stp_capacity = int(input('capacity in m3/d : '))
-MCA_average_BOD = (jakkur_wastewater_quality_data['BOD'].sum())/NB_DAYS
-MCA_design_BOD = MCA_stp_capacity * MCA_average_BOD
+print("For which inhabitant number would you like to design the STP")
+MCA_stp_inhabitants = int(input('number of ihabitants : '))
+MCA_stp_capacity = MCA_stp_inhabitants * wwfracl #minimum capacity to cover the whole intended population en m3/d
+MCA_stp_capacity_2 = MCA_stp_capacity * 10**(-6) #in MLD
 
-print("At which percentage do you plan the STP will be used (between 0 and 1)?")
-MCA_stp_utilisation = float(input('utilisation between 0 and 1 : '))
-MCA_treated_BOD = MCA_stp_capacity * MCA_stp_utilisation * average_BOD
-MCA_treated_volume = MCA_stp_capacity * MCA_stp_utilisation
+print ("The minimum design capacity should be: "+ str(MCA_stp_capacity_2)+ ' MLD')
+# MCA_average_influent_BOD = (jakkur_wastewater_quality_data['BOD'].mean())/1000
+
+
+# print("At which percentage do you plan the STP will be used (between 0 and 1)?")
+# MCA_stp_utilisation = float(input('utilisation between 0 and 1 : '))
+# MCA_treated_volume = MCA_stp_capacity * MCA_stp_utilisation
 
 tss_standard = int(input('tss standard: ')) #enter the target tss concentration (mg/L)
 cod_standard = int(input('cod standard: '))
@@ -690,37 +767,47 @@ for idex_tech in range(0,nb_tech):
     MCA_phosphate[idex_tech] = f_MCA_phosphate.mean()
     MCA_TP[idex_tech] = f_MCA_TP.mean()
     
-    #standardization   
-    MCA_tss_score[idex_tech] = abs(abs(MCA_tss[idex_tech]-tss_standard)- MCA_tss.mean())/MCA_tss.std()
-    MCA_cod_score[idex_tech] = abs(abs(MCA_cod[idex_tech]-cod_standard)- MCA_cod.mean())/MCA_cod.std()
-    MCA_bod_score[idex_tech] = abs(abs(MCA_bod[idex_tech]-bod_standard)- MCA_bod.mean())/MCA_bod.std()
-    MCA_nitrate_score[idex_tech] = abs(abs(MCA_nitrate[idex_tech]-nitrate_standard)- MCA_nitrate.mean())/MCA_nitrate.std()
-    MCA_TN_score[idex_tech] = abs(abs(MCA_TN[idex_tech]-TN_standard)- MCA_TN.mean())/MCA_TN.std()
-    MCA_ammonia_score[idex_tech] = abs(abs(MCA_ammonia[idex_tech]-ammonia_standard)- MCA_ammonia.mean())/MCA_ammonia.std()
-    MCA_phosphate_score[idex_tech] = abs(abs(MCA_phosphate[idex_tech]-phosphate_standard)- MCA_phosphate.mean())/MCA_phosphate.std()
-    MCA_TP_score[idex_tech] = abs(abs(MCA_TP[idex_tech]-TP_standard)- MCA_TP.mean())/MCA_TP.std()
+    #standardization  
+    MCA_tss_score[idex_tech] = abs(MCA_tss[idex_tech]-tss_standard)
+    MCA_cod_score[idex_tech] = abs(MCA_cod[idex_tech]-cod_standard)
+    MCA_bod_score[idex_tech] = abs(MCA_bod[idex_tech]-bod_standard)
+    MCA_nitrate_score[idex_tech] = abs(MCA_nitrate[idex_tech]-nitrate_standard)
+    MCA_TN_score[idex_tech] = abs(MCA_TN[idex_tech]-TN_standard)
+    MCA_ammonia_score[idex_tech] = abs(MCA_ammonia[idex_tech]-ammonia_standard)
+    MCA_phosphate_score[idex_tech] = abs(MCA_phosphate[idex_tech]-phosphate_standard)
+    MCA_TP_score[idex_tech] = abs(MCA_TP[idex_tech]-TP_standard)
+    
+    MCA_tss_score[idex_tech] = (MCA_tss_score[idex_tech]- MCA_tss_score.mean())/MCA_tss_score.std()
+    MCA_cod_score[idex_tech] = (MCA_cod_score[idex_tech]- MCA_cod_score.mean())/MCA_cod_score.std()
+    MCA_bod_score[idex_tech] = (MCA_bod_score[idex_tech]- MCA_bod_score.mean())/MCA_bod_score.std()
+    MCA_nitrate_score[idex_tech] = (MCA_nitrate_score[idex_tech]- MCA_nitrate_score.mean())/MCA_nitrate_score.std()
+    MCA_TN_score[idex_tech] = (MCA_TN_score[idex_tech]- MCA_TN_score.mean())/MCA_TN_score.std()
+    MCA_ammonia_score[idex_tech] = (MCA_ammonia_score[idex_tech]- MCA_ammonia_score.mean())/MCA_ammonia_score.std()
+    MCA_phosphate_score[idex_tech] = (MCA_phosphate_score[idex_tech]- MCA_phosphate_score.mean())/MCA_phosphate_score.std()
+    MCA_TP_score[idex_tech] =  (MCA_TP_score[idex_tech]-  MCA_TP_score.mean())/ MCA_TP_score.std()
         
-    MCA_capital_costs[idex_tech],MCA_O_M_costs[idex_tech] = total_cost(technology, MCA_stp_capacity, MCA_treated_volume, MCA_design_BOD, MCA_treated_BOD )
+    MCA_capital_costs[idex_tech],MCA_O_M_costs[idex_tech] = total_cost(technology, MCA_stp_inhabitants )
     
-    MCA_capital_costs_score[idex_tech] = (MCA_capital_costs[idex_tech]- MCA_capital_costs.mean())/MCA_capital_costs.std()
-    MCA_O_M_costs_score[idex_tech] = (MCA_O_M_costs[idex_tech] - MCA_O_M_costs.mean())/MCA_O_M_costs.std()
+    MCA_capital_costs_score[idex_tech] = ((MCA_capital_costs[idex_tech]- MCA_capital_costs.mean())/MCA_capital_costs.std())
+    MCA_O_M_costs_score[idex_tech] = ((MCA_O_M_costs[idex_tech] - MCA_O_M_costs.mean())/MCA_O_M_costs.std())
     
-    MCA_total_score[idex_tech] = MCA_tss_score[idex_tech]+ MCA_cod_score[idex_tech] + MCA_bod_score[idex_tech]
-    + MCA_nitrate_score[idex_tech] + MCA_TN_score[idex_tech]+ MCA_ammonia_score[idex_tech]
-    + MCA_phosphate_score[idex_tech] + MCA_TP_score[idex_tech] + MCA_capital_costs[idex_tech] + MCA_O_M_costs_score[idex_tech] #all parameters are weighted equally
+    MCA_total_score[idex_tech] =(MCA_tss_score[idex_tech]+ MCA_bod_score[idex_tech]+MCA_TN_score[idex_tech]+ MCA_nitrate_score[idex_tech]+ 4*MCA_capital_costs_score[idex_tech] + 4*MCA_O_M_costs_score[idex_tech]) #the two criteria are weighted equally
+ 
+    MCA_matrix = pd.DataFrame([technology_table, MCA_tss_score, MCA_bod_score, MCA_TN_score,MCA_nitrate_score, MCA_capital_costs_score, MCA_O_M_costs_score, MCA_total_score])
+    MCA_matrix = MCA_matrix.T
+    MCA_matrix.columns = ['technology_table', 'MCA_tss_score', 'MCA_bod_score','MCA_TN_score','MCA_nitrate_score', 'MCA_capital_costs_score', 'MCA_O_M_costs_score', 'MCA_total_score']
+    MCA_matrix['rank'] = MCA_matrix['MCA_total_score'].rank(method ='max')
+    pd.DataFrame(MCA_matrix).to_csv("C:/Users/mkona/OneDrive/Bureau/Imperial_Msc EEBM_2021/Summer Project/project/WWT_module_repo/outputs_WW/test.csv")
     
 #%%
     
-    MCA_matrix = pd.DataFrame([technology_table, MCA_tss_score, MCA_cod_score, MCA_bod_score,MCA_nitrate_score, MCA_TN_score, MCA_ammonia_score, MCA_phosphate_score, MCA_TP_score, MCA_capital_costs_score, MCA_capital_costs_score, MCA_total_score])
+    MCA_matrix = pd.DataFrame([technology_table, MCA_tss_score, MCA_cod_score, MCA_bod_score,MCA_nitrate_score, MCA_TN_score, MCA_ammonia_score, MCA_capital_costs_score, MCA_O_M_costs_score, MCA_total_score])
     MCA_matrix = MCA_matrix.T
-    MCA_matrix.columns = ['technology_table', 'MCA_tss_score', 'MCA_cod_score', 'MCA_bod_score','MCA_nitrate_score', 'MCA_TN_score', 'MCA_ammonia_score', 'MCA_phosphate_score', 'MCA_TP_score', 'MCA_capital_costs_score', 'MCA_capital_costs_score', 'MCA_total_score']
+    MCA_matrix.columns = ['technology_table', 'MCA_tss_score', 'MCA_cod_score', 'MCA_bod_score', 'MCA_TN_score', 'MCA_ammonia_score', 'MCA_capital_costs_score', 'MCA_O_M_costs_score', 'MCA_total_score']
     MCA_matrix['rank'] = MCA_matrix['MCA_total_score'].rank(method ='max')
-        
+    
+    pd.DataFrame(MCA_matrix).to_csv("C:/Users/mkona/OneDrive/Bureau/Imperial_Msc EEBM_2021/Summer Project/project/WWT_module_repo/outputs_WW/test.csv")
 
-        
-        
-        
-        
         
     
 
